@@ -1,0 +1,22 @@
+{
+  "todos": [
+    {
+      "title": "First TODO",
+      "completed": false,
+      "editing": false,
+      "id": 1
+    },
+    {
+      "title": "Second TODO",
+      "completed": false,
+      "editing": false,
+      "id": 2
+    },
+    {
+      "title": "Third TODO",
+      "completed": false,
+      "editing": false,
+      "id": 3
+    }
+  ]
+}
