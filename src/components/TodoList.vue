@@ -2,7 +2,7 @@
   <div class="todo-list">
     <input type="text" class="todo-list__input" placeholder="What needs to be done?" v-model="newTodo" @keyup.enter="addTodo">
     
-    
+    <transition-group name="fade-scale">
       <div v-for="(todo, index) in todosFiltered" :key="todo.id" class="todo-item">
         
         <input type="checkbox" v-model="todo.completed">
@@ -15,7 +15,7 @@
         <div class="todo-item__remove" @click="removeTodo(index)">&times;</div>
 
       </div>
-    
+    </transition-group>
 
     <div class="extra-container">
       <div class="extra-container__left">
@@ -115,9 +115,10 @@ export default {
     },
     doneEdit(todo, index) {
       if (todo.title.trim() == '') todo.title = this.beforeEditCache
+
       axios.put('http://localhost:3000/todos/' + (this.todos[index].id), { 'title'    : todo.title,
-                                                                 'completed': false,
-                                                                 'editing'  : false})
+                                                                           'completed': false,
+                                                                           'editing'  : false})
       todo.editing = false
     },
     cancelEdit(todo) {
@@ -215,10 +216,10 @@ export default {
 .fade-enter, .fade-leave-to
   opacity: 0
 
-.fade-air-enter-active, .fade-air-leave-active
+.fade-scale-enter-active, .fade-scale-leave-active
   transition: ease all 0.5s
 
-.fade-air-enter, .fade-air-leave-to
+.fade-scale-enter, .fade-scale-leave-to
   opacity: 0
   transform: scale(0)
 
