@@ -48,19 +48,14 @@ export default {
   name: 'todo-list',
   async created() {
     const {data} = await axios.get('http://localhost:3000/todos')
+    let currentId = await axios.get('http://localhost:3000/currentId')
     this.todos = data
+    this.idForTodo = currentId.data.id
 
-    var maxId = 0
-    console.log(data)
-    for (let i = 0; i < data.length; i++) {
-      if ( data[i] > 0 ) {
-        maxId = i
-      }
-    }
   },
   data () {
     return {
-      idTodos: null,
+      idForTodo: Number,
       newTodo: '',
       beforeEditCache: '',
       filter: 'all',
@@ -103,16 +98,20 @@ export default {
       if (this.newTodo.trim().length == 0) return
 
       let todoItem = {
-        id: +this.idTodos,
+        id: this.idForTodo,
         title: this.newTodo,
         completed: false,
         editing: false
       }
 
       this.newTodo = ''
+      this.idForTodo++
+
+      let currentId = {id: this.idForTodo}
 
       this.todos.push(todoItem)
       axios.post('http://localhost:3000/todos', todoItem)
+      axios.post('http://localhost:3000/currentId', currentId)
     },
     removeTodo(index) {
       axios.delete('http://localhost:3000/todos/' + this.todos[index].id )
@@ -137,28 +136,41 @@ export default {
     completedTodo(todo, index) {
       if ( todo.completed === false) {
         todo.completed = true
-        axios.put('http://localhost:3000/todos/' + (this.todos[index].id), { 'title'    : todo.title,
+        axios.put('http://localhost:3000/todos/' + this.todos[index].id, { 'title'    : todo.title,
                                                                            'completed': todo.completed,
                                                                            'editing'  : false})
       } else {
         todo.completed = false
         axios.put('http://localhost:3000/todos/' + (this.todos[index].id), { 'title'    : todo.title,
-                                                                           'completed': todo.completed,
-                                                                           'editing'  : false})
+                                                                             'completed': todo.completed,
+                                                                             'editing'  : false})
       }
       
       
     },
     checkAllTodos() {
       this.todos.forEach( todo => todo.completed = event.target.checked )
+
+      for ( let i = 0; i < this.todos.length; i++ ) {
+
+        if ( this.todos[i].completed === true ) {
+          axios.put('http://localhost:3000/todos/' + this.todos[i].id, { 'title'    : this.todos[i].title,
+                                                                         'completed': this.todos[i].completed,
+                                                                         'editing'  : false})
+        } else {
+          axios.put('http://localhost:3000/todos/' + this.todos[i].id, { 'title'    : this.todos[i].title,
+                                                                         'completed': this.todos[i].completed,
+                                                                         'editing'  : false})
+        }
+
+      }
     },
     clearCompleted() {
 
       for ( let i = 0; i < this.todos.length; i++ ) {
 
         if ( this.todos[i].completed === true ) {
-          console.log(i)
-          axios.delete('http://localhost:3000/todos/' + (i + 1) )
+          axios.delete('http://localhost:3000/todos/' + this.todos[i].id )
         }
 
       }

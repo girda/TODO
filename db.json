@@ -1,22 +1,31 @@
 {
   "todos": [
     {
-      "id": 1,
-      "title": "ASD",
+      "title": "First TODO",
       "completed": false,
-      "editing": false
+      "editing": false,
+      "id": 16
     },
     {
-      "id": 2,
-      "title": "asd",
+      "title": "Second TODO",
       "completed": false,
-      "editing": false
+      "editing": false,
+      "id": 17
     },
     {
-      "id": 4,
-      "title": "asd",
+      "title": "Third TODO",
       "completed": false,
-      "editing": false
+      "editing": false,
+      "id": 18
+    },
+    {
+      "title": "Four TODO",
+      "completed": false,
+      "editing": false,
+      "id": 19
     }
-  ]
+  ],
+  "currentId": {
+    "id": 20
+  }
 }
