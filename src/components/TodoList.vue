@@ -5,7 +5,7 @@
     <transition-group name="fade-scale">
       <div v-for="(todo, index) in todosFiltered" :key="todo.id" class="todo-item">
         
-        <input type="checkbox" v-model="todo.completed">
+        <input type="checkbox" v-model="todo.completed" @click="completedTodo(todo, index)">
 
         <div class="todo-item__left">
           <div v-if="!todo.editing" @dblclick="editTodo(todo)" class="todo-item__label" :class="{ completed : todo.completed }">{{todo.title}}</div>
@@ -46,17 +46,26 @@ import axios from 'axios'
 
 export default {
   name: 'todo-list',
+  async created() {
+    const {data} = await axios.get('http://localhost:3000/todos')
+    this.todos = data
+
+    var maxId = 0
+    console.log(data)
+    for (let i = 0; i < data.length; i++) {
+      if ( data[i] > 0 ) {
+        maxId = i
+      }
+    }
+  },
   data () {
     return {
+      idTodos: null,
       newTodo: '',
       beforeEditCache: '',
       filter: 'all',
       todos: []
     }
-  },
-  async created() {
-    const {data} = await axios.get('http://localhost:3000/todos')
-    this.todos = data
   },
   directives: {
     focus: {
@@ -94,7 +103,7 @@ export default {
       if (this.newTodo.trim().length == 0) return
 
       let todoItem = {
-        id: +this.todos.length + 1,
+        id: +this.idTodos,
         title: this.newTodo,
         completed: false,
         editing: false
@@ -117,7 +126,7 @@ export default {
       if (todo.title.trim() == '') todo.title = this.beforeEditCache
 
       axios.put('http://localhost:3000/todos/' + (this.todos[index].id), { 'title'    : todo.title,
-                                                                           'completed': false,
+                                                                           'completed': todo.completed,
                                                                            'editing'  : false})
       todo.editing = false
     },
@@ -125,11 +134,37 @@ export default {
       todo.title = this.beforeEditCache
       todo.editing = false
     },
+    completedTodo(todo, index) {
+      if ( todo.completed === false) {
+        todo.completed = true
+        axios.put('http://localhost:3000/todos/' + (this.todos[index].id), { 'title'    : todo.title,
+                                                                           'completed': todo.completed,
+                                                                           'editing'  : false})
+      } else {
+        todo.completed = false
+        axios.put('http://localhost:3000/todos/' + (this.todos[index].id), { 'title'    : todo.title,
+                                                                           'completed': todo.completed,
+                                                                           'editing'  : false})
+      }
+      
+      
+    },
     checkAllTodos() {
       this.todos.forEach( todo => todo.completed = event.target.checked )
     },
     clearCompleted() {
+
+      for ( let i = 0; i < this.todos.length; i++ ) {
+
+        if ( this.todos[i].completed === true ) {
+          console.log(i)
+          axios.delete('http://localhost:3000/todos/' + (i + 1) )
+        }
+
+      }
+
       this.todos = this.todos.filter(todo => !todo.completed)
+      
     }
   }
 }
